@@ -1,30 +1,23 @@
-const UserRepository = require("../repository/user.repository");
+const LapanganRepository = require("../repository/lapangan.repository");
 const { Router } = require("express");
 const router = Router();
-const userRepository = new UserRepository();
+const lapanganRepository = new LapanganRepository();
 
 router.get("/", async (req, res) => {
-  const dto = {
-    name: req.query.name,
-    address: req.query.address,
-    type: req.query.type,
-    email: req.query.email,
-  };
-
-  const users = await userRepository.findAll(dto);
+  const lapangan = await lapanganRepository.findAll();
   res.json({
     status: 200,
-    message: "List Users",
-    data: { list: users },
+    message: "List lapangan",
+    data: { list: lapangan },
   });
 });
 
 router.get("/:id", async (req, res) => {
-  const user = await userRepository.findById(req.params.id);
+  const user = await lapanganRepository.findById(req.params.id);
   if (user) {
     res.json({
       status: 200,
-      message: "List Users",
+      message: "Detail lapangan",
       data: user,
     });
   } else {
@@ -37,26 +30,24 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const user = await userRepository.create(req.body);
+  const lapangan = await lapanganRepository.create(req.body);
   res
     .status(201)
-    .json({ status: 201, message: "Success Create User ", data: user });
+    .json({ status: 201, message: "Success Create lapangan ", data: lapangan });
 });
 
 router.put("/:id", async (req, res) => {
-  const result = await userRepository.update(req.params.id, req.body);
-
+  const result = await lapanganRepository.update(req.params.id, req.body);
+  
   if (result.affected) {
-    res
-      .status(200)
-      .json({ status: 200, message: "User updated successfully", data: null });
+    res.status(200).json({ status: 200,message: "User updated successfully", data: null });
   } else {
     res.status(404).json("User not found");
   }
 });
 
 router.delete("/:id", async (req, res) => {
-  const result = await userRepository.delete(req.params.id);
+  const result = await lapanganRepository.delete(req.params.id);
   console.log(result);
   if (result.affected) {
     res.json({ message: "User deleted successfully" });

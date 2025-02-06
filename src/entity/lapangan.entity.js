@@ -1,8 +1,8 @@
 const { EntitySchema } = require("typeorm");
 
-const UserEntity = new EntitySchema({
-  name: "User",
-  tableName: "users",
+const LapanganEntity = new EntitySchema({
+  name: "Lapangan",
+  tableName: "lapangan",
   columns: {
     id: {
       primary: true,
@@ -12,17 +12,16 @@ const UserEntity = new EntitySchema({
     name: {
       type: "varchar",
     },
-    email: {
-      type: "varchar",
-      unique: true,
-    },
     address: {
       type: "varchar",
     },
     type: {
       type: "enum",
-      enum: ["member", "general", "admin"],
-      default: "general",
+      enum: ["mini", "medium", "large"],
+      default: "mini",
+    },
+    price: {
+      type: "integer",
     },
     created_at: {
       type: "timestamp",
@@ -38,12 +37,12 @@ const UserEntity = new EntitySchema({
       nullable: true,
     },
   },
-    relations:{
+  relations: {
     bookings: {
       type: "one-to-many",
       target: "Booking",
     },
-  }
+  },
 });
 
-module.exports = { UserEntity };
+module.exports = { LapanganEntity };

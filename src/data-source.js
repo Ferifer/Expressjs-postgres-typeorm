@@ -8,7 +8,7 @@ const AppDataSource = new DataSource({
   password: "1sampai8",
   database: "funfootball",
   synchronize: true,
-  logging: false,
+  logging: true,
   entities: ["src/entity/*.js"],
   migrations: ["src/migration/*.js"],
 });

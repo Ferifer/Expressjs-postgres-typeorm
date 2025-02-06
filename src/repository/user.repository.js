@@ -1,10 +1,28 @@
-const { getRepository } = require("typeorm");
+const { getRepository, Like } = require("typeorm");
 const User = require("../entity/user.entity");
 const AppDataSource = require("../data-source");
 const userRepository = AppDataSource.getRepository(User.UserEntity);
 class UserRepository {
-  async findAll() {
-    const users = await userRepository.find({ where: { deleted_at: null } });
+  async findAll(dto) {
+    const whereConditions = {};
+
+    if (dto.name) {
+      whereConditions.name = Like(`%${dto.name}%`);
+    }
+
+    if (dto.address) {
+      whereConditions.address = Like(`%${dto.address}%`);
+    }
+
+    if (dto.type) {
+      whereConditions.type = dto.type;
+    }
+
+    if (dto.email) {
+      whereConditions.email = Like(`%${dto.email}%`);
+    }
+
+    const users = await userRepository.find({ where: whereConditions });
     return users;
   }
 
@@ -20,13 +38,13 @@ class UserRepository {
     return newUser;
   }
 
-  // async update(id, user) {
-  //   return await getRepository(User).update(id, user);
-  // }
+  async update(id, user) {
+    return await userRepository.update(id, user);
+  }
 
-  //   async delete(id) {
-  //     return await getRepository(User).delete(id);
-  //   }
+  async delete(id) {
+    return await userRepository.softDelete(id);
+  }
 }
 
 module.exports = UserRepository;
