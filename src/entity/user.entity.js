@@ -12,6 +12,14 @@ const UserEntity = new EntitySchema({
     name: {
       type: "varchar",
     },
+    password: {
+      type: "varchar",
+      nullable: true,
+    },
+    access_token: {
+      type: "varchar",
+      nullable: true,
+    },
     email: {
       type: "varchar",
       unique: true,
@@ -38,12 +46,12 @@ const UserEntity = new EntitySchema({
       nullable: true,
     },
   },
-    relations:{
+  relations: {
     bookings: {
       type: "one-to-many",
       target: "Booking",
     },
-  }
+  },
 });
 
 module.exports = { UserEntity };

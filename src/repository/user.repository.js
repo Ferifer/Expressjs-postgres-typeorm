@@ -1,6 +1,7 @@
 const { getRepository, Like } = require("typeorm");
 const User = require("../entity/user.entity");
 const AppDataSource = require("../data-source");
+const { hashPassword } = require("../utils/auth");
 const userRepository = AppDataSource.getRepository(User.UserEntity);
 class UserRepository {
   async findAll(dto) {
@@ -32,8 +33,15 @@ class UserRepository {
   }
 
   async create(user) {
-    const { name, email, address } = user;
-    const newUser = userRepository.create({ name, email, address });
+    const { name, password, email, address } = user;
+    // Hash the password
+    const hashedPassword = await hashPassword(password);
+    const newUser = userRepository.create({
+      name,
+      password: hashedPassword,
+      email,
+      address,
+    });
     await userRepository.save(newUser);
     return newUser;
   }
@@ -44,6 +52,20 @@ class UserRepository {
 
   async delete(id) {
     return await userRepository.softDelete(id);
+  }
+
+  async login(username, password) {
+    const user = await userRepository.findOne({
+      where: { name: username, password: password },
+    });
+    return user;
+  }
+
+  async findByEmail(email) {
+    const user = await userRepository.findOne({
+      where: { email: `%${email}%` },
+    });
+    return user;
   }
 }
 

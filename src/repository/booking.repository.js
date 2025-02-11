@@ -4,34 +4,34 @@ const Booking = require("../entity/booking.entity");
 const Lapangan = require("../entity/lapangan.entity");
 // Memulai koneksi ke database
 const AppDataSource = require("../data-source");
+const { Like } = require("typeorm");
 const bookingRepository = AppDataSource.getRepository(Booking.BookingEntity);
 const lapanganRepository = AppDataSource.getRepository(Lapangan.LapanganEntity);
 
 class BookingRepository {
   async findAll(dto) {
-    // find sama saja dengan query (select * from )
-    const booking = await bookingRepository.find();
+    const whereConditions = {};
     if (dto.username) {
-      //logic booking where
+      // pilih nama relasinya kemudian pilih kolomnya
+      whereConditions.user = { name: Like(`%${dto.username}%`) };
     }
-    //ketika return/mengembalikan data jika tidak membutuhkan custom response bisa langsung return booking
-    const data = booking.map((item) => {
-      return {
-        // item / apapun itu aliasing nama berisi object data booking
-        id: item.id,
-        user_id: item.user_id,
-        lapangan_id: item.lapangan_id,
-        duration: item.duration,
-        // case payment status menggunakan ternary
-        // kondisi:
-        // jika terpenuhi / sama maka kasih value yg di inginkan setelah tanda '?'
-        // jika tidak maka kasih value yg di inginkan setelah tanda ':'
-        payment_status: item.payment_status === true ? "paid" : "unpaid",
-        total_price: item.total_price,
-        order_date: item.order_date,
-      };
+    const bookings = await bookingRepository.find({
+      relations: { user: true, lapangan: true },
+      where: whereConditions,
     });
-    return data;
+    return bookings.map((item) => ({
+      id: item.id,
+      user_id: item.user_id,
+      username: item.user.name,
+      lapangan_id: item.lapangan_id,
+      nama_lapangan: item.lapangan.name,
+      alamat_lapangan: item.lapangan.address,
+      type_lapangan: item.lapangan.type,
+      duration: item.duration,
+      payment_status: item.payment_status ? "paid" : "unpaid",
+      total_price: item.total_price,
+      order_date: item.order_date,
+    }));
   }
 
   async findById(id) {

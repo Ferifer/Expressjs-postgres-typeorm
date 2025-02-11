@@ -8,8 +8,15 @@ const router = Router();
 // kumpulan API/Url
 // 1. setelah route gunakan method request (post, get, patch, put, delete)
 router.get("/", async (req, res) => {
+  const dto = {
+    username: req.query.username,
+    nama_lapangan: req.query.nama_lapangan,
+    alamat_lapangan: req.query.alamat_lapangan,
+    type_lapangan: req.query.type_lapangan,
+    payment_status: req.query.payment_status === "paid" ? true : false,
+  };
   // memanggil function dari Class Booking Repository
-  const booking = await bookingRepository.findAll();
+  const booking = await bookingRepository.findAll(dto);
   // return/ data berbentuk JSON yang kita berikan (res.json)
   res.json({
     status: 200,
