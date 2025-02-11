@@ -63,7 +63,7 @@ class UserRepository {
 
   async findByEmail(email) {
     const user = await userRepository.findOne({
-      where: { email: `%${email}%` },
+      where: { email: email },
     });
     return user;
   }
