@@ -61,6 +61,7 @@ router.post("/login", async (req, res) => {
 
     // Generate JWT token
     const token = generateToken({ id: user.id, email: user.email });
+    await userRepository.update(user.id, { access_token: token });
 
     res.json({ status: 200, message: "Login successful", token });
   } catch (error) {
