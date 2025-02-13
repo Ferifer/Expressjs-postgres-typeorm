@@ -1,10 +1,11 @@
 const jwt = require("jsonwebtoken");
 // Import bcrypt untuk menggunakan package tersebut
 const bcrypt = require("bcrypt");
+require("dotenv").config();
 
-const SECRET_KEY = "1sampai8"; // Replace with a strong secret key
+const SECRET_KEY = process.env.SECRET_KEY || "secret"; // Replace with a strong secret key
 
-const SALT_ROUNDS = 10; // Number of salt rounds for bcrypt
+const SALT_ROUNDS = process.env.SALT_ROUNDS || 10; // Number of salt rounds for bcrypt
 
 // Function to generate a JWT token
 const generateToken = (user) => {
