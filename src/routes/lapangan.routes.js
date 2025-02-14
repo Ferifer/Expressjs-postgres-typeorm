@@ -3,6 +3,14 @@ const { Router } = require("express");
 const router = Router();
 const lapanganRepository = new LapanganRepository();
 
+router.use((req, res, next) => {
+  if (req.method !== "GET" && !req.is("application/json")) {
+    return res
+      .status(400)
+      .json({ status: 400, message: "Invalid content type" });
+  }
+  next();
+});
 router.get("/", async (req, res) => {
   const lapangan = await lapanganRepository.findAll();
   res.json({
@@ -38,11 +46,88 @@ router.post("/", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   const result = await lapanganRepository.update(req.params.id, req.body);
-  
+
   if (result.affected) {
-    res.status(200).json({ status: 200,message: "User updated successfully", data: null });
+    res
+      .status(200)
+      .json({ status: 200, message: "User updated successfully", data: null });
   } else {
     res.status(404).json("User not found");
+  }
+});
+
+// ========== BULK OPERATIONS ==========
+
+router.post("/bulk", async (req, res) => {
+  try {
+    const { data } = req.body; // Destructure request body
+    if (!Array.isArray(data) || data.length === 0) {
+      return res
+        .status(400)
+        .json({ status: 400, message: "Invalid data format" });
+    }
+
+    const lapangans = data.map(({ name, price, type, address }) => ({
+      name,
+      price,
+      type,
+      address,
+    }));
+
+    const result = await lapanganRepository.bulkCreate(lapangans);
+    res.status(201).json({
+      status: 201,
+      message: "Bulk create successful",
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({ status: 500, message: error.message });
+  }
+});
+
+router.patch("/bulk", async (req, res) => {
+  try {
+    const { data } = req.body; // Destructure request body
+    if (!Array.isArray(data) || data.length === 0) {
+      return res
+        .status(400)
+        .json({ status: 400, message: "Invalid data format" });
+    }
+
+    const updates = data.map(({ id, name, price, type, address }) => ({
+      id,
+      name,
+      price,
+      type,
+      address,
+    }));
+
+    await lapanganRepository.bulkUpdate(updates);
+    res.status(200).json({
+      status: 200,
+      message: "Bulk update successful",
+      data: null,
+    });
+  } catch (error) {
+    res.status(500).json({ status: 500, message: error.message });
+  }
+});
+
+// Bulk Delete
+router.delete("/bulk", async (req, res) => {
+  try {
+    const { data } = req.body; // Expecting { data: [1, 2, 3] }
+    if (!Array.isArray(data) || data.length === 0) {
+      return res.status(400).json({ status: 400, message: "Invalid data" });
+    }
+    const result = await lapanganRepository.bulkDelete(data);
+    res.status(200).json({
+      status: 200,
+      message: "Bulk delete successful",
+      data: null,
+    });
+  } catch (error) {
+    res.status(500).json({ status: 500, message: error.message });
   }
 });
 

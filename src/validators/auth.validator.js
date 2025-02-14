@@ -30,8 +30,19 @@ const authValidator = {
 
     // Validasi password
     body("password")
-      .isLength({ min: 6 })
-      .withMessage("Password must be at least 6 characters long"),
+      .isStrongPassword({
+        minLength: 6,
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+        minSymbols: 1,
+        maxRepeat: 3,
+      })
+      .withMessage(
+        "Password must be at least 6 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one symbol"
+      ),
+
+    body("address").notEmpty().withMessage("Address is required "),
   ],
 
   /**
